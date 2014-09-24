@@ -110,7 +110,7 @@ namespace WPFSnake
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Grid.Children.Clear();
-            map = GameMap.LoadMapFromfile("Box.map");
+            map = GameMap.LoadMapFromfile(@"..\..\Box.map");
 
             map.OnCollision += Collision; //Обработчик колизий
 
@@ -126,6 +126,7 @@ namespace WPFSnake
 
             PrintMap(map, this.Grid);
 
+            //MessageBox.Show(this.Resources.Count.ToString());
             //System.Threading.Thread T = new System.Threading.Thread(BeginGame);
             //T.Start();
             //BeginGame();
