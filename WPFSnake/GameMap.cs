@@ -40,7 +40,7 @@ namespace GameAPI
                         if (Symbol != ' ' && !Char.IsControl(Symbol) && !Char.IsSeparator(Symbol))
                         {
                             GameAPI.Point p = new Point(X, Y);
-                            map.Add(p, new WPFSnake.Wall(p));
+                            map.Add(p, new Wall(p));
                         }
                     }
 

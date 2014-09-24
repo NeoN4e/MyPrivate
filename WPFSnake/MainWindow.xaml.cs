@@ -23,9 +23,8 @@ namespace WPFSnake
     public partial class MainWindow : Window
     {
         static GameAPI.GameMap map;
-        static Snake snake;
-
-        Image Wall = new Image();
+        static GameAPI.Snake snake;
+        static GameAPI.Mouse apple;
 
         /// <summary>Выводит на экран карту</summary>
         static void PrintMap(GameMap map, Grid Grid)
@@ -39,6 +38,42 @@ namespace WPFSnake
  
         }
 
+        /// <summary>Метод генерация и размещения mouse</summary>
+        static void RandomAppleGeneration()
+        {
+            GameAPI.Point p;
+
+            //Генерируем координаты пока не пусто
+            do
+            {
+                p = new GameAPI.Point(MyRandom.R.Next(map.XSize), MyRandom.R.Next(map.YSize));
+            } while (map[p] != null);
+
+
+            if (apple == null)
+                apple = new GameAPI.Mouse(p);
+            else
+                apple.CurentPosition = p;
+
+            map.Add(apple.CurentPosition,apple);
+        }
+
+        /// <summary>Обработчик Столкновений</summary>
+        static void Collision(GameAPI.GameMap map, GameAPI.Point p, Object NewObj, Object ExistObj)
+        {
+            if ((NewObj is GameAPI.Snake) && (ExistObj is GameAPI.Mouse))
+            {
+                //Удалим яблочко
+                map.Remove(p);
+                //(NewObj as Snake).Grow(map); // Вырастим
+
+                RandomAppleGeneration(); // Сгенерим новое яблочко
+            }
+            //else
+                //throw new GameOverExeption();
+        }
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -51,11 +86,19 @@ namespace WPFSnake
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            Grid.Children.Clear();
             map = GameMap.LoadMapFromfile("Box.map");
 
-            snake = new Snake(new GameAPI.Point(2, 2)); //Создадим змею
-           // snake.Vektor = MoveVektor.Right;
+            map.OnCollision += Collision; //Обработчик колизий
+
+            snake = new GameAPI.Snake(new GameAPI.Point(2, 2)); //Создадим змею
             map.Add(snake.CurentPosition, snake); // Добавим змею на карту
+
+            //SnakeBody sb = new SnakeBody(new GameAPI.Point(2, 3));
+            //map.Add(sb.CurentPosition, sb);
+
+            RandomAppleGeneration(); //Сгенерим яблочко
+
 
             PrintMap(map, this.Grid);
         }
@@ -71,109 +114,11 @@ namespace WPFSnake
                 case Key.Right: snake.Vektor = MoveVektor.Right; break;
             }
 
-            Grid.Children.Clear();
-            //snake.Move(map);
-            PrintMap(map,Grid);
+            snake.Move(map);
         }
         
     }
 
-
-    class GameObject : Image
-    { 
-        public int Size = 40;
-
-        /// <summary>Координаты текущей позиции</summary>
-        public GameAPI.Point CurentPosition 
-        {
-            get { return new GameAPI.Point((int)this.Margin.Left / Size, (int)this.Margin.Top / Size); }
-            protected set { this.Margin = new Thickness() { Left = Size * value.X, Top = Size * value.Y }; } 
-        }
-
-        /// <summary> Устанавливает Картинку объекта</summary>
-        public String SetIcon 
-        { 
-            get { return this.Source.ToString(); }
-            set { this.Source = (ImageSource)(new ImageSourceConverter()).ConvertFromString(value); }
-        }
-
-        public GameObject(GameAPI.Point p)
-            : base()
-        {
-            this.CurentPosition = p;
-
-            //this.Source = (ImageSource)(new ImageSourceConverter()).ConvertFromString(@"..\..\wall.png");
-            this.Height = Size;
-            this.Width = Size;
-
-           
-            this.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            this.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-        }
-    }
-
-    class Wall : GameObject
-    {
-        public Wall(GameAPI.Point p)
-            : base(p)
-        { this.SetIcon = @"..\..\wall.png"; }
-    }
-
-    class Snake : GameObject
-    {
-        /// <summary>Направление движения</summary>
-        public MoveVektor Vektor 
-        {
-            get { return v; }
-            set 
-            {
-                v = value;
-                MessageBox.Show(this.Margin.ToString());
-                //this.RenderTransform = new RotateTransform((int)v * 90, (this.Margin.Left + 40 / 2), (this.Margin.Top + 40 / 2));
-                
-                this.RenderTransform = new RotateTransform( (int)v * 90);
-                MessageBox.Show(this.Margin.ToString());
-            } 
-        }
-        MoveVektor v;
-
-        public Snake(GameAPI.Point p)
-            : base(p)
-        { 
-            this.SetIcon = @"..\..\SnakeHead.png";
-           
-
-        }
-
-        /// <summary>Метод движения</summary>
-        public void Move(GameMap map)
-        {
-            GameAPI.Point? newPosition;
-
-            //Шагнем героем по карте
-            newPosition = map.Add(this.CurentPosition.Move(Vektor), this);
-            
-            if (newPosition != null)
-            {
-                //Если удалось шагнуть удалим себя со старой позиции
-                map.Remove(this.CurentPosition);
-
-                //Сохраним текущюю позицию персонажа
-                this.CurentPosition = (GameAPI.Point)newPosition;
-
-                //Событие
-                //if (onMove != null) onMove(this, map);
-
-            }
-
-        }
-    }
-
-    struct SnakeBody
-    {
-        public override string ToString()
-        {
-            return "*";
-        }
-    }
+    
+   
 }
