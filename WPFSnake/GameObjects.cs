@@ -99,6 +99,11 @@ namespace GameAPI
 
     class Snake : GameObject
     {
+        //Коллекция Хвоста
+        Queue<GameAPI.SnakeBody> BodyQueue = new Queue<GameAPI.SnakeBody>();
+
+        private bool mustGrow = false;
+
         /// <summary>Направление движения</summary>
         public MoveVektor Vektor
         {
@@ -132,15 +137,44 @@ namespace GameAPI
                 //Если удалось шагнуть удалим себя со старой позиции
                 map.Remove(this.CurentPosition);
 
+                //Отресуем Хвост
+                if (mustGrow) //Нужно удленить змейку
+                {
+                    SnakeBody sb = new SnakeBody(this.CurentPosition);
+                    BodyQueue.Enqueue(sb);
+                    map.Add(sb.CurentPosition, sb); //Добавим хвостик на карту
+
+                    //Событие ОнРасти
+                    if (OnGrow != null) OnGrow(sb, null);
+                    this.mustGrow = false;
+                }
+                else
+                {
+                    if (this.BodyQueue.Count > 0)
+                    {
+                        SnakeBody sb = BodyQueue.Dequeue();
+                        map.Remove(sb.CurentPosition); // Удалим Хвостик с игровой карты
+
+                        sb.CurentPosition = this.CurentPosition;
+                        BodyQueue.Enqueue(sb);
+                        map.Add(sb.CurentPosition, sb); //Добавим хвостик на карту
+                    }
+                }
+
                 //Сохраним текущюю позицию персонажа
                 this.CurentPosition = (GameAPI.Point)newPosition;
-
-                //Событие
-                //if (onMove != null) onMove(this, map);
-
-            }
+             }
 
         }
+
+        /// <summary>Расти</summary>
+        public void Grow(GameAPI.GameMap map)
+        {
+            this.mustGrow = true;
+        }
+
+        /// <summary>При росте змеии</summary>
+        public event EventHandler OnGrow;
     }
 
     class SnakeBody : GameObject

@@ -65,7 +65,7 @@ namespace WPFSnake
             {
                 //Удалим яблочко
                 map.Remove(p);
-                //(NewObj as Snake).Grow(map); // Вырастим
+                (NewObj as Snake).Grow(map); // Вырастим
 
                 RandomAppleGeneration(); // Сгенерим новое яблочко
             }
@@ -94,12 +94,13 @@ namespace WPFSnake
             snake = new GameAPI.Snake(new GameAPI.Point(2, 2)); //Создадим змею
             map.Add(snake.CurentPosition, snake); // Добавим змею на карту
 
+            snake.OnGrow += (Object obj,EventArgs ea) => { Grid.Children.Add((SnakeBody)obj); };//Добавим в Грид Новые куски змеи...
+
             //SnakeBody sb = new SnakeBody(new GameAPI.Point(2, 3));
             //map.Add(sb.CurentPosition, sb);
 
             RandomAppleGeneration(); //Сгенерим яблочко
-
-
+            
             PrintMap(map, this.Grid);
         }
 
