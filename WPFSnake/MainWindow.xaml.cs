@@ -25,6 +25,7 @@ namespace WPFSnake
         static GameAPI.GameMap map;
         static GameAPI.Snake snake;
         static GameAPI.Mouse apple;
+        static System.Windows.Threading.DispatcherTimer dispatcherTimer; 
 
         /// <summary>Выводит на экран карту</summary>
         static void PrintMap(GameMap map, Grid Grid)
@@ -74,29 +75,6 @@ namespace WPFSnake
                // throw new GameOverExeption();
         }
 
-        static void BeginGame()
-        {
-            //System.Threading.Thread.Sleep(1000);
-            //try
-            //{
-                System.Threading.Thread.Sleep(400);
-                while (true)
-                    snake.Move(map);
-                
-            //}
-            //catch (GameOverExeption gwe)
-            //{
-            //    Grid.Children.Clear();
-            //    //<Label Content="Geme over" Margin="121,90,122,126" FontSize="48" FontWeight="Bold" Foreground="#FFFA0000"/>
-            //    Label l = new Label();
-            //    l.Content = "Geme over";
-            //    l.FontSize = 48;
-            //    l.Foreground = Brushes.Red;
-
-            //    Grid.Children.Add(l);
-            //}
-        }
-
         public MainWindow()
         {
             InitializeComponent();
@@ -118,19 +96,18 @@ namespace WPFSnake
             map.Add(snake.CurentPosition, snake); // Добавим змею на карту
 
             snake.OnGrow += (Object obj, EventArgs ea) => { Grid.Children.Add((SnakeBody)obj); };//Добавим в Грид Новые куски змеи...
-
-            //SnakeBody sb = new SnakeBody(new GameAPI.Point(2, 3));
-            //map.Add(sb.CurentPosition, sb);
-
+            snake.OnGrow += (Object obj, EventArgs ea) => { if (snake.Count % 4 ==0 ) dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, dispatcherTimer.Interval.Milliseconds / 2); };//Добавим в Грид Новые куски змеи...
+    
             RandomAppleGeneration(); //Сгенерим яблочко
 
             PrintMap(map, this.Grid);
 
-            //MessageBox.Show(this.Resources.Count.ToString());
-            //System.Threading.Thread T = new System.Threading.Thread(BeginGame);
-            //T.Start();
-            //BeginGame();
-            
+            //Поехали
+            dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+            dispatcherTimer.Tick += (Object obj, EventArgs ea) => { snake.Move(map); };
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 600);
+            dispatcherTimer.Start();
+
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -144,7 +121,7 @@ namespace WPFSnake
                 case Key.Right: snake.Vektor = MoveVektor.Right; break;
             }
 
-            snake.Move(map);
+            //snake.Move(map);
         }
         
     }

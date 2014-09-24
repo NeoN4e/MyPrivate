@@ -116,6 +116,9 @@ namespace GameAPI
         //Коллекция Хвоста
         Queue<GameAPI.SnakeBody> BodyQueue = new Queue<GameAPI.SnakeBody>();
 
+        /// <summary>Длина змеи</summary>
+        public int Count { get { return BodyQueue.Count+1; } }
+
         private bool mustGrow = false;
 
         public Snake(GameAPI.Point p)
