@@ -5,7 +5,8 @@
         Title="MainWindow" Height="361.883" Width="525" KeyDown="Window_KeyDown">
 
     <Grid Margin="0,0,17,-5">
-        <Grid x:Name="Grid" Margin="1,0,-1,42" />
+        <Grid x:Name="Grid" Margin="1,0,-1,42" >
+        </Grid>
         <Button x:Name="Button1" Content="Start" Click="Button_Click" Margin="8,0,0,13" Height="24" VerticalAlignment="Bottom" RenderTransformOrigin="0.505,4.16" HorizontalAlignment="Left" Width="121" />
     </Grid>
 

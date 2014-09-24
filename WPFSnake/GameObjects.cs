@@ -88,6 +88,20 @@ namespace GameAPI
             this.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             this.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
         }
+
+        /// <summary>Направление движения</summary>
+        public MoveVektor Vektor
+        {
+            get { return v; }
+            set
+            {
+                v = value;
+                //Свойство RenderTransformOrigin использует значение структуры Point несколько нестандартным образом, так как Point не представляет абсолютное положение в системе координат. Вместо этого значения между 0 и 1 интерпретируются как коэффициент для диапазона текущего элемента по каждой из осей X и Y. Например, значение (0.5,0.5) вызовет центрирование преобразования прорисовки по элементу, а (1,1) поместит преобразование прорисовки в нижний правый угол элемента. NaN не является приемлемым значением. 
+                this.RenderTransformOrigin = new System.Windows.Point(0.5, 0.5);
+                this.RenderTransform = new System.Windows.Media.RotateTransform((int)v * 90);
+            }
+        }
+        MoveVektor v;
     }
 
     class Wall : GameObject
@@ -103,20 +117,6 @@ namespace GameAPI
         Queue<GameAPI.SnakeBody> BodyQueue = new Queue<GameAPI.SnakeBody>();
 
         private bool mustGrow = false;
-
-        /// <summary>Направление движения</summary>
-        public MoveVektor Vektor
-        {
-            get { return v; }
-            set
-            {
-                v = value;
-                //Свойство RenderTransformOrigin использует значение структуры Point несколько нестандартным образом, так как Point не представляет абсолютное положение в системе координат. Вместо этого значения между 0 и 1 интерпретируются как коэффициент для диапазона текущего элемента по каждой из осей X и Y. Например, значение (0.5,0.5) вызовет центрирование преобразования прорисовки по элементу, а (1,1) поместит преобразование прорисовки в нижний правый угол элемента. NaN не является приемлемым значением. 
-                this.RenderTransformOrigin = new System.Windows.Point(0.5, 0.5);
-                this.RenderTransform = new System.Windows.Media.RotateTransform((int)v * 90);
-            }
-        }
-        MoveVektor v;
 
         public Snake(GameAPI.Point p)
             : base(p)
@@ -141,6 +141,7 @@ namespace GameAPI
                 if (mustGrow) //Нужно удленить змейку
                 {
                     SnakeBody sb = new SnakeBody(this.CurentPosition);
+                    sb.Vektor = this.Vektor;
                     BodyQueue.Enqueue(sb);
                     map.Add(sb.CurentPosition, sb); //Добавим хвостик на карту
 
@@ -156,6 +157,7 @@ namespace GameAPI
                         map.Remove(sb.CurentPosition); // Удалим Хвостик с игровой карты
 
                         sb.CurentPosition = this.CurentPosition;
+                        sb.Vektor = this.Vektor;
                         BodyQueue.Enqueue(sb);
                         map.Add(sb.CurentPosition, sb); //Добавим хвостик на карту
                     }

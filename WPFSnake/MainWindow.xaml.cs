@@ -55,6 +55,7 @@ namespace WPFSnake
             else
                 apple.CurentPosition = p;
 
+            apple.Vektor = (MoveVektor)MyRandom.R.Next(4);
             map.Add(apple.CurentPosition,apple);
         }
 
@@ -70,9 +71,31 @@ namespace WPFSnake
                 RandomAppleGeneration(); // Сгенерим новое яблочко
             }
             //else
-                //throw new GameOverExeption();
+               // throw new GameOverExeption();
         }
 
+        static void BeginGame()
+        {
+            //System.Threading.Thread.Sleep(1000);
+            //try
+            //{
+                System.Threading.Thread.Sleep(400);
+                while (true)
+                    snake.Move(map);
+                
+            //}
+            //catch (GameOverExeption gwe)
+            //{
+            //    Grid.Children.Clear();
+            //    //<Label Content="Geme over" Margin="121,90,122,126" FontSize="48" FontWeight="Bold" Foreground="#FFFA0000"/>
+            //    Label l = new Label();
+            //    l.Content = "Geme over";
+            //    l.FontSize = 48;
+            //    l.Foreground = Brushes.Red;
+
+            //    Grid.Children.Add(l);
+            //}
+        }
 
         public MainWindow()
         {
@@ -94,14 +117,19 @@ namespace WPFSnake
             snake = new GameAPI.Snake(new GameAPI.Point(2, 2)); //Создадим змею
             map.Add(snake.CurentPosition, snake); // Добавим змею на карту
 
-            snake.OnGrow += (Object obj,EventArgs ea) => { Grid.Children.Add((SnakeBody)obj); };//Добавим в Грид Новые куски змеи...
+            snake.OnGrow += (Object obj, EventArgs ea) => { Grid.Children.Add((SnakeBody)obj); };//Добавим в Грид Новые куски змеи...
 
             //SnakeBody sb = new SnakeBody(new GameAPI.Point(2, 3));
             //map.Add(sb.CurentPosition, sb);
 
             RandomAppleGeneration(); //Сгенерим яблочко
-            
+
             PrintMap(map, this.Grid);
+
+            //System.Threading.Thread T = new System.Threading.Thread(BeginGame);
+            //T.Start();
+            //BeginGame();
+            
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
