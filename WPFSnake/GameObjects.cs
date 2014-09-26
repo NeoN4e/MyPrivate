@@ -130,6 +130,7 @@ namespace GameAPI
         /// <summary>Метод движения</summary>
         public void Move(GameMap map)
         {
+            if (this.Vektor == MoveVektor.Stop) return;
             GameAPI.Point? newPosition;
 
             //Шагнем героем по карте

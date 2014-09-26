@@ -69,10 +69,12 @@ namespace WPFSnake
                 map.Remove(p);
                 (NewObj as Snake).Grow(map); // Вырастим
 
+                if ((NewObj as Snake).Count >= 12) throw new GameWinExeption(); //Віиграли
+
                 RandomAppleGeneration(); // Сгенерим новое яблочко
             }
-            //else
-               // throw new GameOverExeption();
+            else
+               throw new GameOverExeption();
         }
 
         public MainWindow()
@@ -104,7 +106,37 @@ namespace WPFSnake
 
             //Поехали
             dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-            dispatcherTimer.Tick += (Object obj, EventArgs ea) => { snake.Move(map); };
+            dispatcherTimer.Tick += (Object obj, EventArgs ea) => 
+                                    {
+                                        try
+                                        {
+                                            snake.Move(map);
+                                        }
+                                        catch (ApplicationException Aex)
+                                        {
+                                            dispatcherTimer.Stop(); // Остановим таймер
+                                            Grid.Children.Clear();
+
+                                            Label l = new Label();
+                                            l.FontSize = 48;
+                                            l.VerticalAlignment = System.Windows.VerticalAlignment.Center;
+                                            l.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+
+                                            if (Aex is GameOverExeption)
+                                            {
+                                                l.Content = "Game Over";
+                                                l.Foreground = Brushes.Red;
+                                            }
+
+                                            if (Aex is GameWinExeption)
+                                            {
+                                                l.Content = "Win level";
+                                                l.Foreground = Brushes.Green;
+                                            }
+
+                                            Grid.Children.Add(l);
+                                        }
+                                    };
             dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 600);
             dispatcherTimer.Start();
 
